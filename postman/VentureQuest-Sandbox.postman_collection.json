@@ -1,0 +1,106 @@
+{
+  "info": {
+    "name": "VentureQuest AI — PayPal Sandbox",
+    "description": "Sandbox-only requests for the local VentureQuest server. Configure Sandbox credentials in the server environment. This collection does not offer investment returns.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "App · Read Sandbox configuration",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/api/config"
+      }
+    },
+    {
+      "name": "Checkout · Create Sandbox order",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"projectId\": \"{{projectId}}\",\n  \"amount\": \"{{amount}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": "{{baseUrl}}/api/paypal/order"
+      }
+    },
+    {
+      "name": "Checkout · Capture approved Sandbox order",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"orderId\": \"{{orderId}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": "{{baseUrl}}/api/paypal/capture"
+      },
+      "description": "Copy the id from Create Sandbox order. Open https://www.sandbox.paypal.com/checkoutnow?token=ORDER_ID in a browser (replace ORDER_ID), approve with a Sandbox buyer account, set the collection variable orderId, then send this request."
+    },
+    {
+      "name": "Payouts · Send fixed $1 Sandbox game award (optional)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"projectId\": \"{{projectId}}\",\n  \"scenario\": \"Postman Sandbox run\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": "{{baseUrl}}/api/paypal/payout"
+      },
+      "description": "Sandbox only. Requires PAYPAL_PAYOUT_TEST_EMAIL set to a Sandbox recipient. This sends a fixed $1 game award, not an investor return."
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:4173",
+      "type": "string"
+    },
+    {
+      "key": "projectId",
+      "value": "sample-venture",
+      "type": "string"
+    },
+    {
+      "key": "amount",
+      "value": "1.00",
+      "type": "string"
+    },
+    {
+      "key": "orderId",
+      "value": "",
+      "type": "string"
+    }
+  ]
+}
