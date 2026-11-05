@@ -2,6 +2,8 @@
 
 **Global AI Crowdfunding & Venture Simulator** — a free, runnable prototype where builders shape startup ideas with an AI co-founder, try a first experiment, and explore a no-payment simulated innovation market.
 
+**Live demo:** [https://venturequest-ai.onrender.com/](https://venturequest-ai.onrender.com/)
+
 The interface works with Node.js alone. It has no package dependencies, database, paid API requirement, or build step. Local coaching and no-payment demo signals work offline after the page loads. Optional integrations use PayPal Sandbox and a local Ollama model; the app sends no venture information to a cloud AI provider.
 
 ## Run it
@@ -61,7 +63,7 @@ The collection targets the local app at http://localhost:4173 by default. Change
 
 ### PayPal Webhooks (optional)
 
-Set PAYPAL_WEBHOOK_ID to the webhook ID registered on the same PayPal Sandbox REST app. Set its listener URL to https://your-public-host/api/paypal/webhook and subscribe to PAYMENT.CAPTURE.COMPLETED. The server verifies every event through PayPal's verify-webhook-signature API before updating the market. Verified events are sent to open browser sessions through Server-Sent Events. Webhooks are asynchronous notifications, not millisecond guarantees. PayPal needs an HTTPS endpoint it can reach; 127.0.0.1 alone is not reachable from PayPal, so local end-to-end delivery needs a public HTTPS host or tunnel.
+The webhook receiver is already implemented at `POST /api/paypal/webhook`; no extra webhook code is needed for this demo. In the same PayPal Sandbox REST app, register `https://venturequest-ai.onrender.com/api/paypal/webhook`, subscribe to `PAYMENT.CAPTURE.COMPLETED`, then set `PAYPAL_WEBHOOK_ID` in Render to the webhook ID. The server verifies each event with PayPal before emitting the market update to open browser sessions. Checkout capture already updates the signal directly; the webhook is an optional verified notification path and helps demonstrate PayPal's event flow. Webhooks are asynchronous, and the demo's in-memory de-duplication/state can reset on service restart. Local webhook delivery needs a public HTTPS host or tunnel because PayPal cannot reach `127.0.0.1`.
 
 ### PayPal Sandbox Payouts (optional)
 
