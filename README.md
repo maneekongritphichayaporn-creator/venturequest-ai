@@ -22,7 +22,7 @@ Use `Ctrl+C` in the terminal to stop the server. The server uses only Node's bui
 
 ### Local AI coach (default)
 
-The built-in coach works without an API key or internet connection. It uses a transparent heuristic to produce a starter score, a value proposition, a one-line pitch, a business model hypothesis, and a first user experiment. These are lightweight local drafts, not a trained model, market forecast, or investment recommendation. The Live Pitch Arena also uses browser speech synthesis for spoken pitches at no cost. Founder Q&A calls Ollama locally when available and otherwise uses a clearly labelled contextual fallback.
+The built-in coach works without an API key or internet connection. It uses a transparent heuristic to produce a starter score, a value proposition, a one-line pitch, a business model hypothesis, and a first user experiment. These are lightweight local drafts, not a trained model, market forecast, or investment recommendation. The Live Pitch Arena also uses browser speech synthesis for spoken pitches at no cost. Founder Q&A calls Ollama locally when available and otherwise uses a clearly labelled contextual fallback. After a local demo signal or scenario, Ollama can create a fictional simulation briefing; the hosted fallback uses a clearly labelled template.
 
 ### Optional Ollama local model (free)
 
@@ -72,6 +72,7 @@ Set PAYPAL_PAYOUT_TEST_EMAIL to a personal Sandbox recipient account. When PayPa
 - **Builder:** Submit a venture name, user problem, audience, category, solution, and sustainability model.
 - **AI co-founder:** Get a feasibility review plus drafts for a value proposition, target user, business model hypothesis, one-line pitch, and first experiment. Uses Ollama locally when available and a transparent heuristic otherwise.
 - **Live Pitch Arena:** Listen to a browser-spoken 30-second pitch, ask typed questions or use supported browser voice input, and view an animated concept card. Ollama answers founder questions locally when available; the hosted demo uses a contextual fallback.
+- **AI simulation ticker:** After a demo signal or simulation, Ollama can draft a fictional briefing. No external news, real market feed, or real company data is used.
 - **Agent-to-agent bid demo:** A fictional explorer agent negotiates a 5-point community signal with the founder. Accepting it records points only; it does not move money or create ownership.
 - **Interactive market board:** A local simulated ticker, illustrative trend line, fictional region map, and Hall of Fame with clearly labelled game scores and badges. Data comes from the current browser and is not a global leaderboard or real-time market feed.
 - **Sandbox award celebration:** If a Sandbox payout recipient is configured, the pitch arena offers a user-triggered fixed $1 test award and celebration. It is not a dividend, cash-out based on simulation, or investment return.
@@ -98,6 +99,7 @@ The 90-day simulation and arena ticker use illustrative game math only. The tren
 | `GET /api/events` | Server-Sent Events for verified market updates |
 | `POST /api/evaluate` | Ollama local model when available; otherwise local coach and venture drafts |
 | `POST /api/founder/answer` | Answer a pitch question with Ollama locally when available; otherwise a contextual founder fallback |
+| `POST /api/market/briefing` | Draft a fictional market simulation headline locally with Ollama, or return a labelled template |
 | `POST /api/paypal/order` | Create a Sandbox Checkout order ($1–$10) |
 | `POST /api/paypal/capture` | Capture an approved Sandbox order and emit a market signal |
 | `POST /api/paypal/webhook` | Verify and process PayPal Sandbox webhook events |
