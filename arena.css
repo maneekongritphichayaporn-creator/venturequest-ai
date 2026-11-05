@@ -61,3 +61,20 @@
 @media(max-width:800px){.arena-grid{grid-template-columns:1fr}.pitch-arena-grid{grid-template-columns:145px 1fr}}
 @media(max-width:560px){.arena-board{padding:0 16px}.arena-top{align-items:flex-start;flex-direction:column}.pitch-arena-grid{grid-template-columns:1fr}.holo-wrap{min-height:120px}.holo-card{width:100%;min-height:115px}.pitch-arena-head{align-items:flex-start;flex-direction:column}.arena-stats{gap:14px}.arena-question{flex-wrap:wrap}.arena-question input{flex-basis:100%}}
 @media(prefers-reduced-motion:reduce){.arena-ticker span,.arena-map-dot,.holo-card:after{animation:none!important}}
+
+.how-section,.about-sim{max-width:1224px;margin:52px auto;padding:0 0;scroll-margin-top:90px}
+.how-heading{display:flex;align-items:flex-end;justify-content:space-between;gap:18px;margin-bottom:18px}
+.how-heading h2,.about-sim h2{font:700 25px Manrope;letter-spacing:-.05em;margin:5px 0}
+.how-heading p,.about-intro{color:var(--muted);font-size:12px;line-height:1.65;max-width:650px;margin:5px 0 0}
+.how-grid,.about-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:13px}
+.how-card,.about-grid article{background:#fff;border:1px solid var(--line);border-radius:13px;padding:18px;box-shadow:0 4px 18px #1a2c1605}
+.how-step{font:10px 'DM Mono',monospace;color:#6e963e;letter-spacing:.08em}
+.how-card h3,.about-grid h3{font:700 14px Manrope;margin:10px 0 6px}
+.how-card p,.about-grid p{color:#687064;font-size:11px;line-height:1.7;margin:0}
+.about-sim{margin-top:54px;padding:23px;border-radius:16px;background:#edf3e8;border:1px solid #dfe8d7}
+.about-sim h2{font-size:25px}
+.about-intro{margin:4px 0 17px}
+.about-grid{grid-template-columns:repeat(2,1fr)}
+.about-grid article{box-shadow:none}
+@media(max-width:850px){.how-section,.about-sim{margin-left:28px;margin-right:28px}.how-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:560px){.how-section,.about-sim{margin:38px 16px;padding:0}.how-heading{align-items:flex-start;flex-direction:column}.how-heading .btn{width:100%}.how-grid,.about-grid{grid-template-columns:1fr}.about-sim{padding:18px}}
