@@ -1,8 +1,12 @@
 # VentureQuest AI
 
-**Global AI Crowdfunding & Venture Simulator** — a free, runnable prototype where builders shape startup ideas with an AI co-founder, try a first experiment, and explore a no-payment simulated innovation market.
+**Global AI Crowdfunding & Venture Simulator** — a free, runnable prototype where builders shape startup ideas with an AI co-founder, explore a fictional innovation market, and try optional PayPal Sandbox checkout.
 
 **Live demo:** [https://venturequest-ai.onrender.com/](https://venturequest-ai.onrender.com/)
+
+**Source code:** [GitHub repository](https://github.com/maneekongritphichayaporn-creator/venturequest-ai) · **License:** MIT
+
+> **Demo scope:** VentureQuest is a learning game, not a crowdfunding or investment service. Sandbox payments are test transactions. The app does not sell equity, promise returns, calculate real ROI, or send automatic investor payouts.
 
 The interface works with Node.js alone. It has no package dependencies, database, paid API requirement, or build step. Local coaching and no-payment demo signals work offline after the page loads. Optional integrations use PayPal Sandbox and a local Ollama model; the app sends no venture information to a cloud AI provider.
 
@@ -19,6 +23,16 @@ The interface works with Node.js alone. It has no package dependencies, database
 4. Open <http://localhost:4173>.
 
 Use `Ctrl+C` in the terminal to stop the server. The server uses only Node's built-in modules.
+
+## Quick demo walkthrough
+
+1. **Create:** Select **Start a venture**, fill in the idea, and choose **Coach my idea**.
+2. **Publish:** Review the AI draft, score, strengths, risks, and suggested experiment; select **Add to simulated market**.
+3. **Explore:** Open the new card, inspect its pitch, and run the 90-day simulation.
+4. **Signal:** Use a no-payment demo signal, or complete an optional PayPal Sandbox Checkout if credentials are configured.
+5. **Enter the city:** Open **Enter 3D district**, meet a founder, and try the crisis-event button. A local supporter badge appears after a successful Sandbox Checkout in that browser; coin rain is visual only.
+
+For a no-credentials presentation, steps 1–3 and 5 work with the built-in coach; step 4 can use the points-only demo signal.
 
 ## Free integrations
 
@@ -86,6 +100,30 @@ Set PAYPAL_PAYOUT_TEST_EMAIL to a personal Sandbox recipient account. When PayPa
 - **AG Grid Community comparison:** Switch from cards to a sortable and filterable venture table with AI score, simulated signals, explorers, and days remaining. The free Community grid loads from jsDelivr only when selected, so the optional view needs an internet connection.
 - **AI + PayPal demo loop:** The coach suggests a small $1–$10 Sandbox test amount from the venture's simulated score and risks. The visitor chooses the amount and approves PayPal Checkout. After the server confirms a completed capture, the market signal updates and the AI's suggested next experiment is shown. Without credentials, the no-payment signal path remains available.
 
+## Implementation status
+
+This table separates working demo features from the larger product concept:
+
+| Area | In this prototype | Not implemented yet |
+| --- | --- | --- |
+| **AI co-founder / business architect** | Ollama-local drafts or a free heuristic create a value proposition, target user, business-model hypothesis, pitch, and experiment. CSS concept visuals are included. | Image generation, generated production-ready code, and validated market research. |
+| **Feasibility and risk evaluator** | Simulated score, strengths, risks, and next steps appear in the builder, pitch view, and AG Grid comparison. | Probability of success, competitor analysis, and live trend data. |
+| **Market simulator** | 90-day what-if cards and 3D crisis events use illustrative rules informed by the AI score; Ollama can narrate supplied outcomes. | Real economic data, real user behavior, revenue forecasts, ROI, or yield. |
+| **PayPal Checkout and webhooks** | Optional Sandbox order/capture flow; optional signature-verified webhook notifications and browser updates. | Live payments, real fundraising, a persistent shared transaction ledger, and investor accounts. |
+| **Payouts** | Optional manual fixed $1 Sandbox award to the one recipient configured by the operator. | AI-approved, automatic, or investor-specific payouts and dividends. Crisis coin rain is visual only. |
+| **3D supporter badge** | Local Sandbox Supporter badge after a completed Sandbox Checkout in that browser. | Shared identity, transferable credentials, or proof of real ownership. |
+
+## Future roadmap
+
+These are possible next steps, not features currently delivered:
+
+1. **Shared demo data:** Add a free-tier database and user identity so ventures, support signals, and badges can sync across browsers.
+2. **More explainable AI analysis:** Separate generated suggestions from rule-based scoring, show score explanations, and use cited market data only if a reliable source is added.
+3. **Generated venture assets:** Add optional image generation and a safe preview/export workflow for concept art or prototype scaffolds.
+4. **Multiplayer city:** Sync player presence and city updates across sessions.
+5. **Payment activity ledger:** Persist order, capture, and webhook records with idempotency and visible transaction status.
+6. **Payout flow redesign:** Consider recipient-specific Sandbox awards only after the app can identify eligible recipients with consent and explain the award. Any real-money payout, investment, or return feature needs a separate product and compliance review. Crisis events should remain simulations and must not autonomously promise or pay investment returns.
+
 ## Safety and scope
 
 This prototype does not offer securities, equity, lending, investment advice, cash returns, escrow, or actual investment payouts. Community signal points, crisis effects, badge, and coin rain are illustrative game elements saved or displayed in each browser; they are not investments, a shared global ledger, or a payout. The Virtual City is a single-browser demo with local visitor bots, no multiplayer movement sync, and no shared server-side game database. The optional $1 Payouts integration only sends a user-triggered test award to the single Sandbox recipient configured by the operator; it is not sent to each supporter and is not simulated ROI or a dividend. A real crowdfunding product involving money or financial returns would require a separate legal, compliance, fraud, and payment design review before launch.
@@ -123,6 +161,20 @@ The 90-day simulation and arena ticker use illustrative game math only. The tren
 - **CSS concept visualizer and simulated arena board:** No image-generation API, paid chart service, or location data is required.
 - **Three.js 0.187.0:** Optional 3D world renderer loaded from jsDelivr only on `/world`. The rest of the dashboard does not load Three.js. The 3D page needs an internet connection for the CDN and a browser with WebGL support.
 - **Node.js built-in HTTP server:** Serves the prototype and keeps optional credentials server-side.
+
+## Project files
+
+| File | Role |
+| --- | --- |
+| `index.html` | Main dashboard, venture builder, market, pitch details, and scenario simulation. |
+| `server.js` | Dependency-free Node server, AI fallback/Ollama routes, PayPal Sandbox APIs, webhook verification, and event stream. |
+| `payments.js` | Browser-side PayPal event updates and optional award control. |
+| `arena.js`, `arena.css` | Live Pitch Arena, Q&A, voice controls, negotiation demo, and market board. |
+| `world.html`, `world.js`, `world.css` | Three.js city, founder interactions, crisis simulation, badge, and visual effects. |
+| `.env.example` | Reference list of optional environment variable names; it is not loaded automatically. |
+| `render.yaml` | Render service configuration. |
+| `postman/VentureQuest-Sandbox.postman_collection.json` | Optional requests for the Sandbox API flow. |
+| `LICENSE` | MIT License. |
 
 ## Public repository and hosting
 
