@@ -117,6 +117,19 @@ const server = http.createServer(async (req, res) => {
       const ai = ollamaAvailable ? await evaluateWithOllama(project).catch(() => null) : null;
       return send(res, 200, { ... (ai || localEvaluation(project)), source:ai ? `Ollama local · ${ollamaModel}` : 'Local coach' });
     }
+    if (url.pathname === '/api/market/briefing' && req.method === 'POST') {
+      const input=await readJson(req),event=String(input.event||'').trim().slice(0,500),projectName=String(input.projectName||'this venture').trim().slice(0,100),category=String(input.category||'Community').trim().slice(0,50);
+      if(ollamaAvailable){
+        try{
+          const response=await fetch(`${ollamaBase}/api/chat`,{method:'POST',headers:{'content-type':'application/json'},signal:AbortSignal.timeout(20000),body:JSON.stringify({model:ollamaModel,stream:false,options:{temperature:0.4,num_predict:90},messages:[
+            {role:'system',content:'Write one short, lively fictional market simulation headline based only on the supplied event. Begin with “Simulation insight:”. Do not describe real news, live market data, actual companies, actual investment performance, or financial returns.'},
+            {role:'user',content:JSON.stringify({event,projectName,category})}
+          ]})});
+          if(response.ok){const data=await response.json(),headline=String(data.message?.content||'').trim().slice(0,240);if(headline)return send(res,200,{headline,source:`Ollama · ${ollamaModel}`})}
+        }catch{}
+      }
+      return send(res,200,{headline:`Simulation insight: ${projectName} in ${category} created a demo event — ${event}`.slice(0,240),source:'Local simulation'});
+    }
     if (url.pathname === '/api/founder/answer' && req.method === 'POST') {
       const input=await readJson(req),project=input.project||{},question=String(input.question||'').trim().slice(0,800);
       if(!question)return send(res,400,{error:'Enter a question for the founder.'});
