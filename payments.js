@@ -16,7 +16,9 @@
           : project);
         save();
         render();
-        toast("Sandbox payment confirmed — market signal updated.");
+        const venture = projects.find(project => project.id === message.projectId);
+        const nextExperiment = venture?.firstExperiment ? ` AI next test: ${venture.firstExperiment}` : "";
+        toast(`PayPal Sandbox confirmed — ${venture?.name || "venture"} signal updated.${nextExperiment}`);
       } else if ((message.type === "sandbox_payout" || message.type === "payout_status")) {
         toast("Sandbox game award queued: " + message.status);
       }

@@ -51,7 +51,7 @@ The browser loads PayPal JavaScript SDK v6 from PayPal Sandbox using the app cli
 
 To enable the optional $1 Sandbox award, also set the PowerShell environment variable PAYPAL_PAYOUT_TEST_EMAIL to a Sandbox personal account email before starting Node. For actual webhook delivery, set PAYPAL_WEBHOOK_ID to the ID associated with the listener URL; see the Webhooks section below.
 
-Without credentials, use **Record a no-payment demo signal** to exercise the market flow. It does not call PayPal or charge a payment method. Sandbox transactions are test transactions, not real contributions. For a public host, set `HOST=0.0.0.0` in that host's environment; the local default binds only to this computer.
+Without credentials, use **Record a no-payment demo signal** to exercise the market flow. It does not call PayPal or charge a payment method. When Sandbox checkout is configured, the AI coach suggests a small test amount based on the venture's simulated score and listed risks; the visitor can change it and must approve checkout. A completed Sandbox capture is confirmed by the server before it updates the demo signal and sends an AI next-experiment tip. Sandbox payments are test transactions only: they do not fund a real venture, create ownership, or promise a return. For a public host, set `HOST=0.0.0.0` in that host's environment; the local default binds only to this computer.
 
 ### Postman Sandbox collection (optional)
 
@@ -82,7 +82,7 @@ Set PAYPAL_PAYOUT_TEST_EMAIL to a personal Sandbox recipient account. When PayPa
 - **Experiment log:** Save a scenario-specific experiment plan and revisit the latest five plans from the venture pitch. Plans are stored locally in browser storage.
 - **No-payment simulated market:** Browse, filter, and sort example ventures. Record a community signal in points without moving money. Published ventures and signals are saved in browser local storage.
 - **AG Grid Community comparison:** Switch from cards to a sortable and filterable venture table with AI score, simulated signals, explorers, and days remaining. The free Community grid loads from jsDelivr only when selected, so the optional view needs an internet connection.
-- **PayPal Sandbox:** Optionally create and capture $1–$10 test orders. Successful checkout updates the venture's simulated community signal.
+- **AI + PayPal demo loop:** The coach suggests a small $1–$10 Sandbox test amount from the venture's simulated score and risks. The visitor chooses the amount and approves PayPal Checkout. After the server confirms a completed capture, the market signal updates and the AI's suggested next experiment is shown. Without credentials, the no-payment signal path remains available.
 
 ## Safety and scope
 

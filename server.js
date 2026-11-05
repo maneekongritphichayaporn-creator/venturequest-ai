@@ -170,7 +170,7 @@ const server = http.createServer(async (req, res) => {
       const unit=data.purchase_units && data.purchase_units[0], payment=unit && unit.payments && unit.payments.captures && unit.payments.captures[0], saved=orderInfo.get(orderId);
       const projectId=(unit && (unit.custom_id||unit.reference_id))||(saved&&saved.projectId);
       if(data.status==='COMPLETED'&&payment)recordCaptureSignal(projectId,payment.id,(payment.amount&&payment.amount.value)||(saved&&saved.amount));
-      return send(res, 200, { status:data.status, id:data.id, projectId });
+      return send(res, 200, { status:data.status, id:data.id, captureId:payment&&payment.id, amount:payment&&payment.amount&&payment.amount.value, projectId });
     }
     if(url.pathname==='/api/paypal/payout'&&req.method==='POST'){
       const receiver=process.env.PAYPAL_PAYOUT_TEST_EMAIL;
