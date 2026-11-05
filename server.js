@@ -195,7 +195,7 @@ const server = http.createServer(async (req, res) => {
       else emitEvent({type:'paypal_webhook',eventType:event.event_type,eventId:event.id});
       return send(res,200,{received:true});
     }
-    const requested = url.pathname === '/' ? 'index.html' : path.normalize(decodeURIComponent(url.pathname)).replace(/^[/\\]+/, '');
+    const requested = url.pathname === '/' ? 'index.html' : (url.pathname === '/world' || url.pathname === '/world/') ? 'world.html' : path.normalize(decodeURIComponent(url.pathname)).replace(/^[/\\]+/, '');
     const file = path.resolve(root, requested);
     if (!file.startsWith(root + path.sep) || !fs.existsSync(file) || fs.statSync(file).isDirectory()) return send(res, 404, { error:'Not found' });
     res.writeHead(200, { 'content-type':mime[path.extname(file)] || 'application/octet-stream' }); fs.createReadStream(file).pipe(res);
