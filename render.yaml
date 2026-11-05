@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: venturequest-ai
+    runtime: node
+    plan: free
+    buildCommand: node --version
+    startCommand: node server.js
+    healthCheckPath: /
+    envVars:
+      - key: HOST
+        value: 0.0.0.0
