@@ -71,6 +71,7 @@ Set PAYPAL_PAYOUT_TEST_EMAIL to a personal Sandbox recipient account. When PayPa
 
 - **Builder:** Submit a venture name, user problem, audience, category, solution, and sustainability model.
 - **AI co-founder:** Get a feasibility review plus drafts for a value proposition, target user, business model hypothesis, one-line pitch, and first experiment. Uses Ollama locally when available and a transparent heuristic otherwise.
+- **Virtual Innovation City:** Walk a 2D pixel-style Canvas map with WASD/arrow keys, or use touch controls on mobile. Press `E` near a building to open its founder pitch. Buildings evolve from simulated community signal points; PayPal Sandbox capture events update the same browser market when configured.
 - **Live Pitch Arena:** Listen to a browser-spoken 30-second pitch, ask typed questions or use supported browser voice input, and view an animated concept card. Ollama answers founder questions locally when available; the hosted demo uses a contextual fallback.
 - **AI simulation ticker:** After a demo signal or simulation, Ollama can draft a fictional briefing. No external news, real market feed, or real company data is used.
 - **Agent-to-agent bid demo:** A fictional explorer agent negotiates a 5-point community signal with the founder. Accepting it records points only; it does not move money or create ownership.
@@ -85,7 +86,7 @@ Set PAYPAL_PAYOUT_TEST_EMAIL to a personal Sandbox recipient account. When PayPa
 
 ## Safety and scope
 
-This prototype does not offer securities, equity, lending, investment advice, cash returns, escrow, or actual investment payouts. Community signal points and explorers are illustrative game values saved in each browser; they are not money, investments, or a shared global ledger. The optional $1 Payouts integration only sends test awards through PayPal Sandbox; it is not simulated ROI or a dividend. A real crowdfunding product involving money or financial returns would require a separate legal, compliance, fraud, and payment design review before launch.
+This prototype does not offer securities, equity, lending, investment advice, cash returns, escrow, or actual investment payouts. Community signal points and explorers are illustrative game values saved in each browser; they are not money, investments, or a shared global ledger. The Virtual City is a single-browser demo with no multiplayer movement sync or shared server-side game database. The optional $1 Payouts integration only sends test awards through PayPal Sandbox; it is not simulated ROI or a dividend. A real crowdfunding product involving money or financial returns would require a separate legal, compliance, fraud, and payment design review before launch.
 
 Scores are idea-coaching prompts, not evidence that a company is viable. The example projects and market metrics are fictional. Browser local storage is not shared between users and can be cleared by the browser.
 
