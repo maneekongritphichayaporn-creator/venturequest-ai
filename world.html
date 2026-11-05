@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#eaf0e3"><meta name="description" content="Explore Venture Metropolis, a 3D simulated startup city.">
+  <title>Venture Metropolis · VentureQuest AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/world.css">
+</head>
+<body>
+  <header class="world-nav"><a class="world-brand" href="/">✳ venturequest<span>.ai</span></a><div class="world-nav-right"><span class="world-tag">3D INNOVATION DISTRICT · SIMULATED</span><a class="back-link" href="/">← Back to dashboard</a></div></header>
+  <main class="world-page">
+    <section class="world-intro"><div><div class="world-eyebrow">VENTURE METROPOLIS</div><h1>Walk the next idea forward.</h1><p>Explore venture buildings, meet a founder, and try fictional market events. This world uses the venture data stored in this browser.</p></div><div class="world-visitors"><span class="visitor-dots">● ● ●</span><span>3 local simulation visitors</span></div></section>
+    <div class="world-layout">
+      <section class="world-stage">
+        <div class="world-canvas-wrap"><div id="world3d" aria-label="Interactive 3D innovation city"></div><div class="world-hud"><b>WASD / ARROWS</b> move <span>·</span> <b>E</b> talk <span>·</span> click a building to inspect</div><div class="world-feed" id="world-feed" aria-live="polite">City simulation ready. Explore a building to meet its founder.</div><div class="world-status" id="world-status">Loading the 3D city…</div></div>
+        <div class="world-stage-footer"><span>Canvas uses Three.js from a pinned public CDN build.</span><button id="world-event">Run a market crisis scenario</button></div>
+      </section>
+      <aside class="world-sidebar">
+        <div class="world-sidebar-title"><div class="world-eyebrow">FOUNDER DISTRICT</div><h2>Venture details</h2></div>
+        <div class="world-venture-card" id="venture-details"><p>Choose a building to see the venture.</p></div>
+        <div class="world-founder-actions">
+          <button id="world-enter" class="primary" disabled>Meet founder · Open pitch</button>
+          <button id="world-speak" class="secondary" disabled>▶ Listen to 30-second pitch</button>
+        </div>
+        <div class="world-qa"><label for="world-question">Shark Tank Q&amp;A</label><div class="world-qa-row"><input id="world-question" maxlength="800" placeholder="Ask the founder…" disabled><button id="world-ask" disabled>Ask</button></div><div id="world-answer" aria-live="polite"></div></div>
+        <button id="world-demo-signal" class="signal-button" disabled>＋ Add no-payment demo signal</button>
+        <div class="world-list-title">District ventures</div><div id="world-project-list" class="world-project-list"></div>
+        <p class="world-disclaimer">Signal points and building levels are game values, not investments or returns. Simulated visitors are local bots; other players are not connected.</p>
+      </aside>
+    </div>
+  </main>
+  <script type="module" src="/world.js"></script>
+</body>
+</html>
