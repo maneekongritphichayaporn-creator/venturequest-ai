@@ -1,6 +1,16 @@
 (() => {
   const captureKey = "vq-seen-captures";
+  const supporterKey = "vq-sandbox-supporter-badges";
   const seen = new Set(JSON.parse(localStorage.getItem(captureKey) || "[]"));
+  window.vqRecordSandboxSupport = (projectId, captureId) => {
+    if (!projectId || !captureId) return;
+    let badges = [];
+    try { badges = JSON.parse(localStorage.getItem(supporterKey) || "[]"); } catch {}
+    if (!badges.some(item => item.captureId === captureId)) {
+      badges.push({ projectId: String(projectId), captureId: String(captureId), createdAt: new Date().toISOString() });
+      localStorage.setItem(supporterKey, JSON.stringify(badges.slice(-100)));
+    }
+  };
   const events = new EventSource("/api/events");
 
   events.onmessage = event => {
