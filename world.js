@@ -88,7 +88,7 @@ function showProject(p){
 }
 function renderList(){
   const list=document.querySelector('#world-project-list');if(!list)return;
-  list.innerHTML=projects.map((p,i)=>'<button class="'+(p.id===selectedId?'active':'')+'" data-world-project="'+escapeHtml(p.id)+'">'+String(i+1).padStart(2,'0')+' · '+escapeHtml(p.name)+' · L'+levelFor(p)+'</button>').join('');
+  list.innerHTML=projects.slice(0,positions.length).map((p,i)=>'<button class="'+(p.id===selectedId?'active':'')+'" data-world-project="'+escapeHtml(p.id)+'">'+String(i+1).padStart(2,'0')+' · '+escapeHtml(p.name)+' · L'+levelFor(p)+'</button>').join('');
   list.querySelectorAll('[data-world-project]').forEach(btn=>btn.onclick=()=>{const p=projectFor(btn.dataset.worldProject);showProject(p);focusBuilding(p.id)});
 }
 function focusBuilding(id){
@@ -137,7 +137,7 @@ function refreshBuilding(p){
 }
 function submitSignal(){
   const p=projectFor(selectedId);if(!p)return;
-  p.raised=Number(p.raised||0)+1;p.backers=Number(p.backers||0)+1;save();refreshBuilding(p);
+  p.raised=Number(p.raised||0)+100;p.backers=Number(p.backers||0)+1;save();refreshBuilding(p);
   document.querySelector('#world-feed').textContent='No-payment demo signal recorded for '+p.name+'. The building now reflects local game points.';
   say('Demo signal added. No money was charged.');
 }
@@ -182,7 +182,7 @@ function setupWorldControls(){
   document.querySelector('#world-enter').onclick=interact;document.querySelector('#world-speak').onclick=speakPitch;
   document.querySelector('#world-ask').onclick=askFounder;document.querySelector('#world-question').onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();askFounder()}};
   document.querySelector('#world-demo-signal').onclick=submitSignal;document.querySelector('#world-event').onclick=()=>marketEvent(true);
-  document.querySelectorAll('.world-project-list').forEach(list=>list.addEventListener('click',e=>{const btn=e.target.closest('[data-world-project]');if(btn){const p=projectFor(btn.dataset.worldProject);showProject(p);focusBuilding(p.id)}}));
+  
   const events=new EventSource('/api/events');events.onmessage=e=>{try{handleServerSignal(JSON.parse(e.data))}catch{}};
   setInterval(()=>marketEvent(false),120000);
 }
