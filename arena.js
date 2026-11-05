@@ -31,7 +31,7 @@
     });
   }
   function refreshArena(){drawChart();renderHall();}
-  function showNews(message){const ticker=document.querySelector('#arena-news');if(ticker)ticker.textContent=message;newsIndex=(newsIndex+1)%news.length}
+  function showNews(message,project){const ticker=document.querySelector('#arena-news');if(ticker)ticker.textContent='Simulation insight: '+message;newsIndex=(newsIndex+1)%news.length;if(config.aiMode&&config.aiMode.indexOf('Ollama')===0){fetch('/api/market/briefing',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({event:message,projectName:project&&project.name,category:project&&project.category})}).then(r=>r.json()).then(data=>{if(data.headline&&ticker)ticker.textContent=data.headline}).catch(()=>{})}}
   function celebrate(label){
     for(let i=0;i<36;i++){const bit=document.createElement('i');bit.className='arena-confetti';bit.style.left=(Math.random()*100)+'vw';bit.style.background=['#b8f36b','#ffb36c','#e7ddff','#77b9ef'][i%4];bit.style.animationDelay=(Math.random()*.35)+'s';document.body.append(bit);setTimeout(()=>bit.remove(),2200)}
     if(label)toast(label);
@@ -77,9 +77,9 @@
   const originalRender=render;
   render=function(){originalRender();refreshArena()};
   const originalSignal=applySignal;
-  applySignal=function(id,amount){originalSignal(id,amount);const p=projects.find(item=>item.id===id);if(p){signalCount++;series.push(clamp(series[series.length-1]+Math.max(1,Number(amount)||1)));showNews('Demo signal: '+p.name+' gained '+Number(amount||0)+' simulated community points in this browser.');document.querySelector('#arena-category').textContent=p.category||'Community'}refreshArena()};
+  applySignal=function(id,amount){originalSignal(id,amount);const p=projects.find(item=>item.id===id);if(p){signalCount++;series.push(clamp(series[series.length-1]+Math.max(1,Number(amount)||1)));showNews('Demo signal: '+p.name+' gained '+Number(amount||0)+' simulated community points in this browser.',p);document.querySelector('#arena-category').textContent=p.category||'Community';document.querySelectorAll('.arena-map-dot').forEach((dot,i)=>dot.setAttribute('r',i===signalCount%3?'10':'7'))}refreshArena()};
   const originalSimulation=runMarketSimulation;
-  runMarketSimulation=function(p){originalSimulation(p);series.push(clamp(series[series.length-1]+3));showNews('Simulation complete: scenario signals refreshed for '+p.name+'. No revenue or ROI was estimated.');refreshArena();celebrate('Scenario complete · simulated milestone')};
+  runMarketSimulation=function(p){originalSimulation(p);series.push(clamp(series[series.length-1]+3));showNews('Simulation complete: scenario signals refreshed for '+p.name+'. No revenue or ROI was estimated.',p);refreshArena();celebrate('Scenario complete · simulated milestone')};
   renderArena();
-  setInterval(()=>{showNews(news[newsIndex]);},11000);
+  setInterval(()=>{const ticker=document.querySelector('#arena-news');if(ticker){ticker.textContent=news[newsIndex];newsIndex=(newsIndex+1)%news.length}},11000);
 })();
