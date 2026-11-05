@@ -1,6 +1,6 @@
 # VentureQuest AI
 
-**Global AI Crowdfunding & Venture Simulator** — a free, runnable prototype where builders shape startup ideas, get an AI coach's feasibility review, and publish them to a simulated innovation market.
+**Global AI Crowdfunding & Venture Simulator** — a free, runnable prototype where builders shape startup ideas with an AI co-founder, try a first experiment, and explore a no-payment simulated innovation market.
 
 The interface works with Node.js alone. It has no package dependencies, database, paid API requirement, or build step. Local coaching and no-payment demo signals work offline after the page loads. Optional integrations use PayPal Sandbox and a local Ollama model; the app sends no venture information to a cloud AI provider.
 
@@ -22,7 +22,7 @@ Use `Ctrl+C` in the terminal to stop the server. The server uses only Node's bui
 
 ### Local AI coach (default)
 
-The built-in coach works without an API key or internet connection. It uses a transparent heuristic to produce a starter score and prompts for validating audience, need, and assumptions. This is a lightweight local fallback, not a trained model, market forecast, or investment recommendation.
+The built-in coach works without an API key or internet connection. It uses a transparent heuristic to produce a starter score, a value proposition, a one-line pitch, a business model hypothesis, and a first user experiment. These are lightweight local drafts, not a trained model, market forecast, or investment recommendation.
 
 ### Optional Ollama local model (free)
 
@@ -32,7 +32,7 @@ For a full language model without sending venture details to a cloud AI service,
 ollama run qwen2.5:1.5b
 ```
 
-Ollama exposes a local API on `127.0.0.1:11434` using its [chat endpoint](https://docs.ollama.com/api/chat). Restart VentureQuest after Ollama is ready; the app automatically uses the model when it is present and otherwise keeps using the local coach. The model download is about 1 GB, uses disk space, and needs enough memory to run. The [Qwen2.5 model page](https://ollama.com/library/qwen2.5) lists the 1.5B variant and notes that it uses Apache 2.0.
+Ollama exposes a local API on `127.0.0.1:11434` using its [chat endpoint](https://docs.ollama.com/api/chat). Restart VentureQuest after Ollama is ready; the AI co-founder can draft a value proposition, target user, business model hypothesis, short pitch, and first experiment alongside the feasibility review. If Ollama is unavailable, the app uses the local coach drafts. The model download is about 1 GB, uses disk space, and needs enough memory to run. Ollama runs on your computer; Render uses the built-in local coach instead. The [Qwen2.5 model page](https://ollama.com/library/qwen2.5) lists the 1.5B variant and notes that it uses Apache 2.0.
 
 ### PayPal Sandbox Checkout (optional)
 
@@ -70,21 +70,21 @@ Set PAYPAL_PAYOUT_TEST_EMAIL to a personal Sandbox recipient account. When PayPa
 ## What the prototype does
 
 - **Builder:** Submit a venture name, user problem, audience, category, solution, and sustainability model.
-- **AI coach:** Get a feasibility score, strengths, risks, and suggested next steps. The result is explicitly labelled a simulation.
+- **AI co-founder:** Get a feasibility review plus drafts for a value proposition, target user, business model hypothesis, one-line pitch, and first experiment. Uses Ollama locally when available and a transparent heuristic otherwise.
 - **Pitch details:** View a venture's problem, audience, solution, sustainability model, AI strengths, risks, and suggested experiments before supporting it.
 - **90-day market simulation:** Compare a community tailwind, steady market, and competitor pressure through illustrative interest and repeat-use indices, with a suggested experiment for each scenario.
 - **Experiment log:** Save a scenario-specific experiment plan and revisit the latest five plans from the venture pitch. Plans are stored locally in browser storage.
-- **Simulated market:** Browse, filter, and sort example ventures. Published ventures and demo community signals are saved in browser local storage.
+- **No-payment simulated market:** Browse, filter, and sort example ventures. Record a community signal in points without moving money. Published ventures and signals are saved in browser local storage.
 - **AG Grid Community comparison:** Switch from cards to a sortable and filterable venture table with AI score, simulated signals, explorers, and days remaining. The free Community grid loads from jsDelivr only when selected, so the optional view needs an internet connection.
 - **PayPal Sandbox:** Optionally create and capture $1–$10 test orders. Successful checkout updates the venture's simulated community signal.
 
 ## Safety and scope
 
-This prototype does not offer securities, equity, lending, investment advice, cash returns, escrow, or actual investment payouts. “Raised” and “backers” are illustrative game signals; use the no-payment mode for a zero-cost demo. The optional $1 Payouts integration only sends test awards through PayPal Sandbox; it is not simulated ROI or a dividend. A real crowdfunding product involving money or financial returns would require a separate legal, compliance, fraud, and payment design review before launch.
+This prototype does not offer securities, equity, lending, investment advice, cash returns, escrow, or actual investment payouts. Community signal points and explorers are illustrative game values saved in each browser; they are not money, investments, or a shared global ledger. The optional $1 Payouts integration only sends test awards through PayPal Sandbox; it is not simulated ROI or a dividend. A real crowdfunding product involving money or financial returns would require a separate legal, compliance, fraud, and payment design review before launch.
 
 Scores are idea-coaching prompts, not evidence that a company is viable. The example projects and market metrics are fictional. Browser local storage is not shared between users and can be cleared by the browser.
 
-The 90-day simulation uses only the venture's simulated AI score, profile completeness, and local community signal. It does not use live market data, model actual users, or estimate revenue or investment returns.
+The 90-day simulation uses only the venture's simulated AI score, profile completeness, and local community signal. AI-generated pitch and experiment drafts are suggestions to help founders decide what to test; they are not verified facts. It does not use live market data, model actual users, or estimate revenue or investment returns.
 
 ## API routes
 
