@@ -117,6 +117,27 @@ const server = http.createServer(async (req, res) => {
       const ai = ollamaAvailable ? await evaluateWithOllama(project).catch(() => null) : null;
       return send(res, 200, { ... (ai || localEvaluation(project)), source:ai ? `Ollama local · ${ollamaModel}` : 'Local coach' });
     }
+    if (url.pathname === '/api/founder/answer' && req.method === 'POST') {
+      const input=await readJson(req),project=input.project||{},question=String(input.question||'').trim().slice(0,800);
+      if(!question)return send(res,400,{error:'Enter a question for the founder.'});
+      if(ollamaAvailable){
+        try{
+          const response=await fetch(`${ollamaBase}/api/chat`,{method:'POST',headers:{'content-type':'application/json'},signal:AbortSignal.timeout(30000),body:JSON.stringify({model:ollamaModel,stream:false,options:{temperature:0.4,num_predict:180},messages:[
+            {role:'system',content:'You are the founder of the venture described by the user. Answer the investor question in a confident but honest founder voice, in 2-4 concise sentences. Use only facts in the provided venture profile. Do not invent customers, revenue, competitors, traction, or results. Clearly label assumptions and say what still needs testing.'},
+            {role:'user',content:JSON.stringify({venture:project,question})}
+          ]})});
+          if(response.ok){const data=await response.json(),answer=String(data.message?.content||'').trim().slice(0,900);if(answer)return send(res,200,{answer,source:`Ollama · ${ollamaModel}`})}
+        }catch{}
+      }
+      const model=String(project.businessModelDraft||project.businessModel||project.model||'a business model hypothesis to validate');
+      const audience=String(project.targetUser||project.audience||'the intended users');
+      let answer;
+      if(/revenue|price|income|monet|business model|รายได้|ราคา|เงิน/i.test(question))answer=`Our current revenue hypothesis is ${model}. We have not validated willingness to pay yet, so the next step is to test the offer with ${audience} before committing to this model.`;
+      else if(/compet|alternative|different|เดิม|คู่แข่ง|ต่าง/i.test(question))answer=`We are starting with ${audience} and the problem described in this pitch. We have not verified a competitive advantage yet; we would compare the current workaround with a small prototype and learn which part people value most.`;
+      else if(/customer|user|who|ลูกค้า|ผู้ใช้/i.test(question))answer=`The first audience we want to learn from is ${audience}. Our first experiment is to speak with target users and observe whether this problem is important enough for them to try a new approach.`;
+      else answer=`The pitch proposes ${String(project.solution||project.description||'a focused solution')} for ${audience}. We are treating this as a hypothesis, and would test the riskiest assumption with a small user experiment before making stronger claims.`;
+      return send(res,200,{answer:answer.slice(0,900),source:'Local founder fallback'});
+    }
     if (url.pathname === '/api/paypal/order' && req.method === 'POST') {
       const { projectId, amount } = await readJson(req);
       const dollars = Number(amount);
