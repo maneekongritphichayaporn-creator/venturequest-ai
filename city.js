@@ -86,10 +86,10 @@
     const n=nearby();if(n&&n.d<76&&selectedId!==n.p.id){selectedId=n.p.id;updateProjectList()}requestAnimationFrame(frame);
   }
   function selectFromPoint(ev){
-    const rect=canvas.getBoundingClientRect(),x=(ev.clientX-rect.left)*canvas.width/rect.width,y=(ev.clientY-rect.top)*canvas.height/rect.height;
+    canvas.focus();const rect=canvas.getBoundingClientRect(),x=(ev.clientX-rect.left)*canvas.width/rect.width,y=(ev.clientY-rect.top)*canvas.height/rect.height;
     projects.slice(0,slots.length).forEach((p,i)=>{const r=buildingRect(i,p);if(x>=r.x&&x<=r.x+r.w&&y>=r.y&&y<=r.base+44){selectedId=p.id;updateProjectList();setStatus(p.name+' selected. Press E near the door or use Open pitch.')}});
   }
-  canvas.addEventListener('click',selectFromPoint);canvas.addEventListener('keydown',e=>{if(['ArrowLeft','ArrowRight','ArrowUp','ArrowDown',' ','e','E'].includes(e.key)){e.preventDefault();if(e.key==='e'||e.key==='E')interact();else keys.add(e.key)}});
+  canvas.addEventListener('click',selectFromPoint);
   window.addEventListener('keyup',e=>keys.delete(e.key));
   window.addEventListener('keydown',e=>{if(['ArrowLeft','ArrowRight','ArrowUp','ArrowDown','w','a','s','d','W','A','S','D'].includes(e.key)&&document.activeElement===canvas){e.preventDefault();keys.add(e.key)}if((e.key==='e'||e.key==='E')&&document.activeElement===canvas)interact()});
   window.addEventListener('blur',()=>keys.clear());
