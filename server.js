@@ -58,7 +58,7 @@ async function evaluateWithOllama(project) {
 }
 
 function localDrafts(p) {
-  const clean=value=>String(value||'').trim().replace(/\\s+/g,' ').slice(0,220);
+  const clean=value=>String(value||'').trim().replace(/\s+/g,' ').slice(0,220);
   const name=clean(p.name)||'This venture';
   const problem=clean(p.problem)||'a problem worth solving';
   const audience=clean(p.audience)||'people who experience this problem';
