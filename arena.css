@@ -78,3 +78,5 @@
 .about-grid article{box-shadow:none}
 @media(max-width:850px){.how-section,.about-sim{margin-left:28px;margin-right:28px}.how-grid{grid-template-columns:1fr 1fr}}
 @media(max-width:560px){.how-section,.about-sim{margin:38px 16px;padding:0}.how-heading{align-items:flex-start;flex-direction:column}.how-heading .btn{width:100%}.how-grid,.about-grid{grid-template-columns:1fr}.about-sim{padding:18px}}
+
+.hero-actions{flex-wrap:wrap}
