@@ -1,0 +1,63 @@
+
+.arena-board{max-width:1280px;margin:32px auto 46px;padding:0 28px}
+.arena-top{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;margin-bottom:16px}
+.arena-top h2{font:700 23px Manrope;letter-spacing:-.05em;margin:5px 0}
+.arena-top p{margin:4px 0;color:var(--muted);font-size:12px}
+.arena-live{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line);border-radius:99px;padding:7px 10px;background:#fff;font:10px 'DM Mono',monospace;color:#586052}
+.arena-live i{width:7px;height:7px;border-radius:50%;background:#7fc44b;box-shadow:0 0 0 4px #7fc44b22}
+.arena-ticker{overflow:hidden;white-space:nowrap;background:#222a22;color:#f5f8f1;border-radius:10px;padding:12px 0;margin-bottom:15px}
+.arena-ticker span{display:inline-block;padding-left:100%;animation:arena-marquee 35s linear infinite;font:11px 'DM Mono',monospace}
+@keyframes arena-marquee{to{transform:translateX(-100%)}}
+.arena-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:14px}
+.arena-panel{background:#fff;border:1px solid var(--line);border-radius:13px;padding:16px;min-width:0}
+.arena-panel h3{font:700 14px Manrope;margin:0 0 5px}
+.arena-panel .arena-caption{font-size:10px;color:var(--muted);margin:0 0 12px;line-height:1.5}
+.arena-chart{width:100%;height:auto;display:block;background:linear-gradient(180deg,#f6faef,#fff);border-radius:9px}
+.arena-chart-line{fill:none;stroke:#70a63e;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+.arena-chart-area{fill:url(#arenaFill)}
+.arena-stats{display:flex;gap:20px;margin-top:10px;color:var(--muted);font-size:10px}
+.arena-stats b{display:block;color:var(--ink);font:700 17px Manrope;margin-top:3px}
+.arena-map{width:100%;height:auto;display:block;background:#f4f7f0;border-radius:9px}
+.arena-continent{fill:#dce8d2;stroke:#cad9bf;stroke-width:1}
+.arena-map-dot{fill:#91cb55;stroke:#fff;stroke-width:3;filter:drop-shadow(0 0 5px #82bd4c88);animation:arena-glow 2s infinite alternate}
+@keyframes arena-glow{to{filter:drop-shadow(0 0 10px #82bd4c)}}
+.arena-region-label{font:10px 'DM Mono',monospace;fill:#53614c}
+.arena-leader-list{display:grid;gap:8px}
+.arena-leader{display:grid;grid-template-columns:26px 1fr auto;align-items:center;gap:9px;padding:9px;border:1px solid #edf0e9;border-radius:9px}
+.arena-rank{font:700 11px 'DM Mono',monospace;color:#6c8d4c}
+.arena-leader-name{font:700 11px Manrope}
+.arena-leader-meta{font-size:9px;color:var(--muted);margin-top:3px}
+.arena-impact{font:700 10px 'DM Mono',monospace;text-align:right;color:#517d2f}
+.arena-badge{display:inline-block;background:#eef6e5;color:#527b32;border-radius:99px;padding:3px 6px;font-size:8px;margin-top:4px}
+.pitch-arena{margin:16px 0;border:1px solid #dfe8d7;border-radius:13px;padding:15px;background:linear-gradient(135deg,#f3f8ec,#fff 65%)}
+.pitch-arena-head{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:12px}
+.pitch-arena-head h3{font:700 14px Manrope;margin:0}
+.pitch-arena-head p{font-size:10px;color:var(--muted);margin:4px 0 0}
+.pitch-arena-grid{display:grid;grid-template-columns:180px 1fr;gap:14px;align-items:stretch}
+.holo-wrap{perspective:700px;display:grid;place-items:center;min-height:150px}
+.holo-card{width:155px;min-height:145px;border-radius:15px;padding:14px;color:#fff;background:radial-gradient(circle at 80% 15%,#b8f36b99,transparent 32%),linear-gradient(145deg,#263329,#465c3f 70%,#27302a);border:1px solid #b8f36b88;box-shadow:0 14px 28px #24351d28,inset 0 0 26px #b8f36b20;transform:rotateY(-9deg) rotateX(5deg);transition:transform .35s;position:relative;overflow:hidden}
+.holo-card:after{content:'';position:absolute;inset:-40%;background:linear-gradient(110deg,transparent 42%,#ffffff28 50%,transparent 57%);transform:translateX(-60%);animation:holo-shine 4s infinite}
+.holo-card:hover{transform:rotateY(0) rotateX(0) translateY(-3px)}
+@keyframes holo-shine{55%,100%{transform:translateX(65%)}}
+.holo-icon{font-size:28px}
+.holo-tag{font:9px 'DM Mono',monospace;text-transform:uppercase;letter-spacing:.1em;color:#c9f29c}
+.holo-card h4{font:700 14px Manrope;margin:7px 0 5px}
+.holo-card p{font-size:9px;line-height:1.45;color:#e1e8dc;margin:0}
+.pitch-arena-actions{display:flex;gap:7px;flex-wrap:wrap;margin:9px 0}
+.pitch-arena-actions button,.arena-question button{border:0;border-radius:7px;background:#263127;color:white;padding:8px 10px;font-size:10px;font-weight:700}
+.pitch-arena-actions button.light{background:#fff;color:#263127;border:1px solid var(--line)}
+.pitch-avatar{display:flex;align-items:center;gap:8px;font-size:10px;color:#60685e}
+.pitch-avatar-face{width:32px;height:32px;display:grid;place-items:center;border-radius:50%;background:#e7ddff;font-size:17px}
+.pitch-avatar.speaking .pitch-avatar-face{animation:avatar-pulse .55s infinite alternate;box-shadow:0 0 0 5px #b8f36b55}
+@keyframes avatar-pulse{to{transform:scale(1.08)}}
+.arena-question{display:flex;gap:7px;margin-top:7px}
+.arena-question input{min-width:0;flex:1;border:1px solid var(--line);border-radius:7px;padding:9px;font-size:11px}
+.arena-answer{min-height:28px;margin-top:9px;padding:9px;background:#fff;border:1px solid #e8ece4;border-radius:8px;font-size:10px;line-height:1.55;color:#4f584d;white-space:pre-wrap}
+.arena-answer:empty{display:none}
+.arena-negotiation{margin-top:8px;padding:9px;border:1px dashed #b7c5aa;border-radius:8px;background:#fff;font-size:10px;line-height:1.5;white-space:pre-wrap}
+.arena-confetti{position:fixed;z-index:80;top:-14px;width:8px;height:14px;pointer-events:none;animation:arena-fall 1.7s linear forwards}
+@keyframes arena-fall{to{transform:translateY(110vh) rotate(720deg);opacity:.2}}
+.arena-share{border:1px solid var(--line);background:white;border-radius:6px;padding:5px 7px;font-size:8px;margin-top:5px}
+@media(max-width:800px){.arena-grid{grid-template-columns:1fr}.pitch-arena-grid{grid-template-columns:145px 1fr}}
+@media(max-width:560px){.arena-board{padding:0 16px}.arena-top{align-items:flex-start;flex-direction:column}.pitch-arena-grid{grid-template-columns:1fr}.holo-wrap{min-height:120px}.holo-card{width:100%;min-height:115px}.pitch-arena-head{align-items:flex-start;flex-direction:column}.arena-stats{gap:14px}.arena-question{flex-wrap:wrap}.arena-question input{flex-basis:100%}}
+@media(prefers-reduced-motion:reduce){.arena-ticker span,.arena-map-dot,.holo-card:after{animation:none!important}}
