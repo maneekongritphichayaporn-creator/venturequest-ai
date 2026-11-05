@@ -33,30 +33,53 @@ async function evaluateWithOllama(project) {
   const response = await fetch(`${ollamaBase}/api/chat`, {
     method:'POST', headers:{'content-type':'application/json'}, signal:AbortSignal.timeout(90000),
     body:JSON.stringify({ model:ollamaModel, stream:false, format:'json', options:{temperature:0.3}, messages:[
-      { role:'system', content:'You are a cautious startup coach for a fictional venture simulator. Evaluate only idea clarity, user need, delivery plan, and risks. Do not give investment advice or predict financial returns. Return a JSON object with score (integer 1-100), verdict (one sentence), strengths (2 short strings), risks (2 short strings), and nextSteps (2 short strings).' },
+      { role:'system', content:'You are a cautious AI co-founder for a fictional venture simulator. Evaluate idea clarity, user need, delivery plan, and risks. Draft practical venture assets from the user-provided idea. Do not give investment advice, predict financial returns, invent market facts, or claim validation. Return JSON with score (integer 1-100), verdict (one sentence), strengths (2 short strings), risks (2 short strings), nextSteps (2 short strings), valueProposition (one sentence), targetUser (one concise phrase), businessModelDraft (one concise hypothesis), pitch (a concise 2-sentence pitch), and firstExperiment (one measurable test a founder can run within a week).' },
       { role:'user', content:JSON.stringify(project) }
     ] })
   });
   if (!response.ok) throw new Error(`Ollama returned ${response.status}`);
   const data = await response.json();
   const parsed = JSON.parse(data.message?.content || '{}');
+  const draft=localDrafts(project);
   const list = (value, fallback) => Array.isArray(value) ? value.slice(0,3).map(x => String(x).slice(0,240)) : fallback;
+  const text = (value, fallback) => String(value || fallback).trim().slice(0,360);
   return {
     score:Math.max(1,Math.min(100,Math.round(Number(parsed.score) || 50))),
     verdict:String(parsed.verdict || 'A useful starting point; test the riskiest assumption with real users.').slice(0,300),
     strengths:list(parsed.strengths, ['The idea can be shaped through user feedback.']),
     risks:list(parsed.risks, ['Validate the need before building.']),
-    nextSteps:list(parsed.nextSteps, ['Talk with five potential users.', 'Test one small prototype.'])
+    nextSteps:list(parsed.nextSteps, ['Talk with five potential users.', 'Test one small prototype.']),
+    valueProposition:text(parsed.valueProposition,draft.valueProposition),
+    targetUser:text(parsed.targetUser,draft.targetUser),
+    businessModelDraft:text(parsed.businessModelDraft,draft.businessModelDraft),
+    pitch:text(parsed.pitch,draft.pitch),
+    firstExperiment:text(parsed.firstExperiment,draft.firstExperiment)
+  };
+}
+
+function localDrafts(p) {
+  const clean=value=>String(value||'').trim().replace(/\\s+/g,' ').slice(0,220);
+  const name=clean(p.name)||'This venture';
+  const problem=clean(p.problem)||'a problem worth solving';
+  const audience=clean(p.audience)||'people who experience this problem';
+  const solution=clean(p.solution)||'a focused solution';
+  const model=clean(p.model);
+  return {
+    valueProposition:`${audience}: ${solution} addresses ${problem}.`.slice(0,360),
+    targetUser:audience,
+    businessModelDraft:model||'Test a small paid pilot only after users confirm they want this solution.',
+    pitch:`${name} helps ${audience} address ${problem} with ${solution}. The next step is to test the riskiest assumption with real users.`.slice(0,480),
+    firstExperiment:`Within one week, speak with five ${audience} about ${problem}, show them a simple ${solution} concept, and record how many ask to try it.`.slice(0,480)
   };
 }
 
 function localEvaluation(p) {
-  const words = String(p.problem || '').trim().split(/\s+/).filter(Boolean).length;
+  const words = String(p.problem || '').trim().split(/\\s+/).filter(Boolean).length;
   const audience = String(p.audience || '').trim().length;
   const solution = String(p.solution || '').trim().length;
   const model = String(p.model || '').trim().length;
   const score = Math.max(28, Math.min(91, 34 + Math.min(words, 20) + (audience ? 12 : 0) + Math.min(solution, 90) / 8 + Math.min(model, 70) / 10));
-  return { score: Math.round(score), verdict: score > 72 ? 'A promising simulation candidate; validate demand with a small user test.' : 'A useful starting point; sharpen the target user and test the riskiest assumption.', strengths: [audience ? `Clear audience: ${p.audience}` : 'An early idea is ready to explore', solution ? 'A solution direction is defined' : 'Room to shape a distinctive solution'], risks: [audience ? 'Confirm that this audience feels the problem often.' : 'The target user is still unclear.', 'Market response in this simulator is illustrative, not predictive.'], nextSteps: ['Interview five target users and record what they do today.', 'Build the smallest prototype that tests one key assumption.'] };
+  return { score: Math.round(score), verdict: score > 72 ? 'A promising simulation candidate; validate demand with a small user test.' : 'A useful starting point; sharpen the target user and test the riskiest assumption.', strengths: [audience ? `Clear audience: ${p.audience}` : 'An early idea is ready to explore', solution ? 'A solution direction is defined' : 'Room to shape a distinctive solution'], risks: [audience ? 'Confirm that this audience feels the problem often.' : 'The target user is still unclear.', 'Market response in this simulator is illustrative, not predictive.'], nextSteps: ['Interview five target users and record what they do today.', 'Build the smallest prototype that tests one key assumption.'], ...localDrafts(p) };
 }
 
 async function paypalToken() {
