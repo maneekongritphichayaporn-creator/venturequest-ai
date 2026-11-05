@@ -1,5 +1,5 @@
 const root=document.querySelector('#world3d'),feed=document.querySelector('#world-feed'),status=document.querySelector('#world-status');
-const STORE='venturequest-projects-v1',CAPTURE_STORE='vq-seen-captures';
+const STORE='venturequest-projects-v1',CAPTURE_STORE='vq-seen-captures',SUPPORTER_STORE='vq-sandbox-supporter-badges';
 const escapeHtml=value=>String(value==null?'':value).replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
 const starter=[
 {id:'p1',name:'Refill Route',category:'Climate',icon:'♻',description:'A neighborhood map that helps people find refill stations.',problem:'Single-use packaging is hard to avoid.',audience:'Neighborhood residents',solution:'Map refill stations and reward reusable containers.',businessModel:'Local merchant subscriptions',score:86,raised:1240,backers:128,founder:'Maya Chen',pitch:'Refill Route helps neighborhood residents avoid single-use packaging by making refill stations easy to find.'},
@@ -10,8 +10,8 @@ const starter=[
 ];
 let projects;
 try{const stored=JSON.parse(localStorage.getItem(STORE)||'null');projects=Array.isArray(stored)&&stored.length?stored:starter}catch{projects=starter}
-let THREE,scene,camera,renderer,player,selectedId=null,founderMet=false,lastFrame=0,marketPulse=0;
-const buildings=[],keys=new Set(),visitors=[];
+let THREE,scene,camera,renderer,player,playerBadge,selectedId=null,founderMet=false,lastFrame=0,marketPulse=0;
+const buildings=[],keys=new Set(),visitors=[],coinDrops=[];
 const positions=[[-8,-6],[-3,-6],[2,-6],[7,-6],[-8,4],[-3,4],[2,4],[7,4]];
 const categoryColor={Climate:0x80bd66,Health:0xa58bd1,Education:0xe2a957,'AI Tools':0x62a9c3,Community:0xd77d69};
 function say(message){if(status)status.textContent=message}
@@ -34,8 +34,17 @@ function makePerson(color,scale){
   const head=new THREE.Mesh(new THREE.SphereGeometry(.19*s,8,6),new THREE.MeshStandardMaterial({color:0xf1c999,roughness:.9}));head.position.y=1.05*s;group.add(head);
   const cap=createBox(group,.39*s,.11*s,.35*s,0,1.19*s,0,0x324432);return group
 }
+function makeSupporterBadge(){
+  const canvas=document.createElement('canvas');canvas.width=512;canvas.height=112;const ctx=canvas.getContext('2d');
+  ctx.fillStyle='rgba(22,35,27,.92)';ctx.fillRect(5,10,502,92);ctx.strokeStyle='#c9fa8b';ctx.lineWidth=4;ctx.strokeRect(7,12,498,88);
+  ctx.fillStyle='#e4ffc0';ctx.font='bold 30px sans-serif';ctx.textAlign='center';ctx.fillText('SANDBOX SUPPORTER',256,68);
+  const texture=new THREE.CanvasTexture(canvas);texture.colorSpace=THREE.SRGBColorSpace;
+  const sprite=new THREE.Sprite(new THREE.SpriteMaterial({map:texture,transparent:true,depthTest:false,opacity:.94}));sprite.position.set(0,2.02,0);sprite.scale.set(2.55,.56,1);sprite.renderOrder=10;sprite.visible=false;return sprite
+}
+function hasSandboxSupportBadge(){try{return JSON.parse(localStorage.getItem(SUPPORTER_STORE)||'[]').length>0}catch{return false}}
+function refreshSupporterBadge(){if(playerBadge)playerBadge.visible=hasSandboxSupportBadge()}
 function makeBuilding(p,index){
-  const slot=positions[index%positions.length],group=new THREE.Group(),level=levelFor(p),floors=1+level,height=1.3+floors*.58;
+  const slot=positions[index%positions.length],group=new THREE.Group(),level=levelFor(p),floors=1+level,impact=Math.max(-12,Math.min(12,Number(p.marketImpact)||0)),height=1.3+floors*.58+impact*.035;
   group.position.set(slot[0],0,slot[1]);group.userData.projectId=p.id;group.userData.category=p.category||'Community';
   const color=categoryColor[p.category]||categoryColor.Community;
   const shell=createBox(group,2.25,height,1.85,0,height/2,0,color);shell.userData.projectId=p.id;group.userData.shell=shell;
@@ -55,7 +64,7 @@ function makeBuilding(p,index){
   ring.rotation.x=Math.PI/2;ring.position.set(1.65,.05,1.35);group.add(ring);
   group.traverse(obj=>{obj.userData.projectId=p.id});
   scene.add(group);group.scale.y=.8;
-  return {group,project:p,index:index,shell:shell,level:level,baseColor:color,pulseUntil:0}
+  return {group,project:p,index:index,shell:shell,level:level,baseColor:color,pulseUntil:0,eventColor:0x6b9b38,marketImpact:impact}
 }
 function addWorld(){
   scene=new THREE.Scene();scene.background=new THREE.Color(0xdce9d5);scene.fog=new THREE.Fog(0xdce9d5,25,65);
@@ -71,7 +80,7 @@ function addWorld(){
   for(let i=-20;i<20;i+=2.4){createBox(scene,.95,.025,.09,i,.07,0,0xfff3d1);createBox(scene,.09,.025,.95,0,.07,i,0xfff3d1)}
   for(let i=0;i<12;i++){const x=-21+(i%6)*8.4,z=-15+Math.floor(i/6)*29;const trunk=createBox(scene,.18,.9,.18,x,.45,z,0x80613c);const top=new THREE.Mesh(new THREE.ConeGeometry(.8,1.6,5),new THREE.MeshStandardMaterial({color:i%2?0x4c8c49:0x67a950}));top.position.set(x,1.55,z);top.castShadow=true;scene.add(top)}
   projects.slice(0,positions.length).forEach((p,i)=>buildings.push(makeBuilding(p,i)));
-  player=makePerson(0x495a98,1);player.position.set(0,0,1.2);scene.add(player);
+  player=makePerson(0x495a98,1);player.position.set(0,0,1.2);scene.add(player);playerBadge=makeSupporterBadge();player.add(playerBadge);refreshSupporterBadge();
   for(let i=0;i<3;i++){const bot=makePerson([0xd18469,0x7e6eb2,0x4d9b9a][i],.82);scene.add(bot);visitors.push({mesh:bot,phase:i*2.1,radius:5+i*1.1})}
   camera.position.set(9,10,14);camera.lookAt(0,0,0);
   renderer.domElement.addEventListener('click',onCanvasClick);
@@ -136,7 +145,9 @@ function animate(time){
   if(player){moveStep(dt);player.rotation.y=keys.has('arrowleft')||keys.has('a')?-Math.PI/2:keys.has('arrowright')||keys.has('d')?Math.PI/2:0}
   if(camera&&player){const target=new THREE.Vector3(player.position.x+8,9,player.position.z+11);camera.position.lerp(target,.06);camera.lookAt(player.position.x,0.8,player.position.z)}
   visitors.forEach(bot=>{const a=time/3500+bot.phase;bot.mesh.position.set(Math.cos(a)*bot.radius,0,Math.sin(a)*bot.radius);bot.mesh.rotation.y=-a});
-  buildings.forEach(b=>{if(b.group.scale.y<1)b.group.scale.y=Math.min(1,b.group.scale.y+dt*1.4);if(b.pulseUntil>Date.now()){const m=b.shell.material;m.emissive.setHex(0x6b9b38);m.emissiveIntensity=.4+Math.sin(time/100)*.32}else{b.shell.material.emissive.setHex(0x000000);b.shell.material.emissiveIntensity=0}});
+  buildings.forEach(b=>{if(b.group.scale.y<1)b.group.scale.y=Math.min(1,b.group.scale.y+dt*1.4);if(b.pulseUntil>Date.now()){const m=b.shell.material;m.emissive.setHex(b.eventColor);m.emissiveIntensity=.4+Math.sin(time/100)*.32}else{b.shell.material.emissive.setHex(0x000000);b.shell.material.emissiveIntensity=0}});
+  for(let i=coinDrops.length-1;i>=0;i--){const drop=coinDrops[i];drop.mesh.position.y-=drop.speed*dt;drop.mesh.rotation.y+=dt*5;drop.mesh.rotation.z+=dt*2;if(drop.mesh.position.y<.12){scene.remove(drop.mesh);drop.mesh.geometry.dispose();drop.mesh.material.dispose();coinDrops.splice(i,1)}}
+  if(playerBadge&&playerBadge.visible)playerBadge.material.opacity=.78+Math.sin(time/220)*.16;
   if(renderer)renderer.render(scene,camera)
 }
 function refreshBuilding(p){
@@ -163,16 +174,18 @@ function speakPitch(){
   const text=String(p.pitch||((p.name||'This venture')+' helps '+(p.audience||'a specific audience')+' with '+(p.solution||p.description||'a focused solution')+'.')).split(/\s+/).slice(0,72).join(' ');
   speechSynthesis.cancel();const utterance=new SpeechSynthesisUtterance(text);utterance.rate=1.02;utterance.pitch=1.08;speechSynthesis.speak(utterance);say('Playing the founder pitch using browser speech.');
 }
-function updateEventVisual(category){
-  buildings.forEach(b=>{if(b.project.category===category)b.pulseUntil=Date.now()+8000})
+function updateEventVisual(outcomes){
+  outcomes.forEach(outcome=>{let b=buildings.find(item=>item.project.id===outcome.project.id);if(!b)return;b.eventColor=outcome.delta>=0?0x70b942:0xe78b54;b.pulseUntil=Date.now()+9000;refreshBuilding(outcome.project);b=buildings.find(item=>item.project.id===outcome.project.id);if(b){b.eventColor=outcome.delta>=0?0x70b942:0xe78b54;b.pulseUntil=Date.now()+9000}})
+}
+function spawnRewardRain(winners){
+  winners.slice(0,4).forEach(b=>{for(let i=0;i<7;i++){const coin=new THREE.Mesh(new THREE.CylinderGeometry(.13,.13,.055,12),new THREE.MeshStandardMaterial({color:0xffd45f,emissive:0x775000,emissiveIntensity:.28,metalness:.65,roughness:.28}));coin.position.set(b.group.position.x+(Math.random()-.5)*3,4+Math.random()*4,b.group.position.z+(Math.random()-.5)*2.5);coin.rotation.x=Math.PI/2;scene.add(coin);coinDrops.push({mesh:coin,speed:2.3+Math.random()*2.5})}})
 }
 async function marketEvent(manual){
-  const events=[{category:'Climate',title:'Green neighborhood shift',detail:'A fictional community tailwind gives climate concepts more attention.'},{category:'AI Tools',title:'AI tool discovery wave',detail:'A fictional technology trend sends more explorers to AI tool concepts.'},{category:'Health',title:'Wellbeing awareness week',detail:'A fictional health-awareness scenario brings new attention to wellbeing ideas.'},{category:'Education',title:'Learning access challenge',detail:'A fictional education scenario rewards clear onboarding and accessible learning.'}];
-  const event=events[Math.floor(Math.random()*events.length)],example=projects.find(p=>p.category===event.category);
-  document.querySelector('#world-feed').textContent='SIMULATION EVENT: '+event.title+'. '+event.detail;
-  updateEventVisual(event.category);marketPulse++;
-  try{const r=await fetch('/api/market/briefing',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({event:event.detail,projectName:example&&example.name,category:event.category})});const data=await r.json();if(data.headline)document.querySelector('#world-feed').textContent=data.headline}catch{}
-  if(manual)say('Fictional market event applied to '+event.category+'. No payout or real-world market change occurred.');
+  const events=[{category:'Climate',direction:1,title:'Green energy momentum',detail:'A fictional climate policy tailwind brings more attention to neighborhood energy ideas.'},{category:'AI Tools',direction:-1,title:'AI bubble reset',detail:'A fictional market correction makes AI tool builders prove durable user value.'},{category:'Health',direction:-1,title:'Health trust shock',detail:'A fictional privacy concern increases scrutiny of wellbeing products.'},{category:'Education',direction:1,title:'Learning access wave',detail:'A fictional access initiative increases interest in clear, inclusive learning tools.'}];
+  const event=events[Math.floor(Math.random()*events.length)],targets=projects.filter(p=>p.category===event.category),outcomes=targets.map(project=>{const score=Math.max(0,Math.min(100,Number(project.score)||50)),delta=event.direction>0?Math.min(3,1+Math.round(score/35)):Math.max(-3,Math.min(3,Math.round((score-60)/20)));project.marketImpact=Math.max(-12,Math.min(12,(Number(project.marketImpact)||0)+delta));return {project:project,score:score,delta:delta}}),winners=outcomes.filter(item=>item.delta>0),summary=outcomes.map(item=>`${item.project.name} ${item.delta>0?'+':''}${item.delta} impact (AI score ${item.score}/100)`).join('; ')||'No venture in this category yet';
+  save();renderList();document.querySelector('#world-feed').textContent='AI STRESS TEST: '+event.title+'. '+summary+'.';updateEventVisual(outcomes);if(winners.length)spawnRewardRain(winners.map(item=>buildings.find(b=>b.project.id===item.project.id)).filter(Boolean));marketPulse++;
+  try{const r=await fetch('/api/market/briefing',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({event:event.detail,category:event.category,outcomes:summary})});const data=await r.json();if(data.headline)document.querySelector('#world-feed').textContent=data.headline+' · '+summary+' · Coin rain is simulated; no PayPal payout was triggered.'}catch{}
+  if(manual)say('AI stress test applied to '+event.category+'. Coin rain is a game effect only; no money moved.');
 }
 function handleServerSignal(message){
   if(!message||message.type!=='community_signal'||!message.projectId)return;
