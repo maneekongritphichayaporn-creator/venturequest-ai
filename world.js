@@ -10,7 +10,7 @@ const starter=[
 ];
 let projects;
 try{const stored=JSON.parse(localStorage.getItem(STORE)||'null');projects=Array.isArray(stored)&&stored.length?stored:starter}catch{projects=starter}
-let THREE,scene,camera,renderer,player,selectedId=null,lastFrame=0,marketPulse=0;
+let THREE,scene,camera,renderer,player,selectedId=null,founderMet=false,lastFrame=0,marketPulse=0;
 const buildings=[],keys=new Set(),visitors=[];
 const positions=[[-8,-6],[-3,-6],[2,-6],[7,-6],[-8,4],[-3,4],[2,4],[7,4]];
 const categoryColor={Climate:0x80bd66,Health:0xa58bd1,Education:0xe2a957,'AI Tools':0x62a9c3,Community:0xd77d69};
@@ -84,12 +84,21 @@ function showProject(p){
   if(!p)return;selectedId=p.id;
   document.querySelector('#venture-details').innerHTML='<h3>'+escapeHtml(p.name)+'</h3><div class="world-meta">'+escapeHtml(p.category||'Community')+' · SIMULATED SCORE '+Number(p.score||0)+'</div><p>'+escapeHtml(p.description||p.solution||p.problem||'Early venture idea')+'</p><span class="world-level">BUILDING LEVEL '+levelFor(p)+' · '+Number(p.raised||0).toLocaleString()+' SIGNAL POINTS</span>';
   ['#world-enter','#world-speak','#world-question','#world-ask','#world-demo-signal'].forEach(sel=>{const el=document.querySelector(sel);if(el)el.disabled=false});
-  renderList();say('Selected '+p.name+'. Walk to the building and press E to meet the founder.');
+  renderList();say('Founder pitch open: '+p.name+'. Ask a question or listen to the pitch.');
+}
+function hideProjectDetails(){
+  founderMet=false;document.querySelector('#venture-details').innerHTML='<p>Meet a founder to view venture details and the pitch.</p>';
+  ['#world-speak','#world-question','#world-ask','#world-demo-signal'].forEach(sel=>{const el=document.querySelector(sel);if(el)el.disabled=true});
+}
+function approachProject(p){
+  if(!p)return;selectedId=p.id;hideProjectDetails();renderList();focusBuilding(p.id);
+  document.querySelector('#world-enter').disabled=false;
+  document.querySelector('#world-feed').textContent='You are at '+p.name+'. Press E or choose Meet founder · Open pitch.';
 }
 function renderList(){
   const list=document.querySelector('#world-project-list');if(!list)return;
   list.innerHTML=projects.slice(0,positions.length).map((p,i)=>'<button class="'+(p.id===selectedId?'active':'')+'" data-world-project="'+escapeHtml(p.id)+'">'+String(i+1).padStart(2,'0')+' · '+escapeHtml(p.name)+' · L'+levelFor(p)+'</button>').join('');
-  list.querySelectorAll('[data-world-project]').forEach(btn=>btn.onclick=()=>{const p=projectFor(btn.dataset.worldProject);showProject(p);focusBuilding(p.id)});
+  list.querySelectorAll('[data-world-project]').forEach(btn=>btn.onclick=()=>approachProject(projectFor(btn.dataset.worldProject)));
 }
 function focusBuilding(id){
   const b=buildings.find(item=>item.project.id===id);if(!b)return;
@@ -103,11 +112,11 @@ function nearestBuilding(){
 }
 function interact(){
   const n=nearestBuilding();if(!n.building||n.distance>3.5){say('Move closer to a founder booth, then press E.');return}
-  showProject(n.building.project);document.querySelector('#world-feed').textContent='Founder booth: '+n.building.project.name+'. Ask a question or listen to the pitch.';
+  founderMet=true;showProject(n.building.project);document.querySelector('#world-feed').textContent='Founder booth: '+n.building.project.name+'. Ask a question or listen to the pitch.';
 }
 function onCanvasClick(event){
   const rect=renderer.domElement.getBoundingClientRect(),pointer=new THREE.Vector2((event.clientX-rect.left)/rect.width*2-1,-((event.clientY-rect.top)/rect.height*2-1)),ray=new THREE.Raycaster();ray.setFromCamera(pointer,camera);
-  const hit=ray.intersectObjects(buildings.map(b=>b.group),true)[0];if(hit){const p=projectFor(hit.object.userData.projectId);if(p){showProject(p);document.querySelector('#world-feed').textContent='Building selected: '+p.name+'. Use the founder panel or walk up and press E.'}}
+  const hit=ray.intersectObjects(buildings.map(b=>b.group),true)[0];if(hit){const p=projectFor(hit.object.userData.projectId);if(p)approachProject(p)}
 }
 function collides(x,z){
   return buildings.some(b=>Math.abs(x-b.group.position.x)<1.55&&Math.abs(z-b.group.position.z)<1.35)
@@ -133,7 +142,7 @@ function animate(time){
 function refreshBuilding(p){
   const old=buildings.find(b=>b.project.id===p.id);if(!old)return;
   const i=old.index;scene.remove(old.group);old.group.traverse(obj=>{if(obj.geometry)obj.geometry.dispose();if(obj.material){if(Array.isArray(obj.material))obj.material.forEach(m=>m.dispose());else obj.material.dispose()}});
-  buildings[i]=makeBuilding(p,i);buildings[i].group.scale.y=.55;showProject(p);
+  buildings[i]=makeBuilding(p,i);buildings[i].group.scale.y=.55;if(founderMet&&selectedId===p.id)showProject(p);
 }
 function submitSignal(){
   const p=projectFor(selectedId);if(!p)return;
@@ -190,7 +199,7 @@ async function start(){
   try{
     THREE=await import('https://cdn.jsdelivr.net/npm/three@0.187.0/build/three.module.js');
     addWorld();setupWorldControls();
-    selectedId=projects[0]&&projects[0].id;if(selectedId)showProject(projects[0]);renderList();
+    selectedId=null;renderList();
     document.querySelector('#world-feed').textContent='3 fictional district visitors are exploring. Walk to a building to meet its founder.';
     say('Use WASD or arrow keys to explore. Press E at a founder booth.');
   }catch(error){
