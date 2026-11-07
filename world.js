@@ -17,12 +17,16 @@ const categoryColor={Climate:0x80bd66,Health:0xa58bd1,Education:0xe2a957,'AI Too
 function say(message){if(status)status.textContent=message}
 function save(){try{localStorage.setItem(STORE,JSON.stringify(projects))}catch{say('Browser storage is full; this change could not be saved.')}}
 function levelFor(p){const points=Number(p&&p.raised||0);return points>=2500?4:points>=1500?3:points>=500?2:1}
-function canvasLabel(text){
-  const c=document.createElement('canvas');c.width=512;c.height=128;const g=c.getContext('2d');
-  g.fillStyle='#1e2c22';g.fillRect(0,0,512,128);g.fillStyle='#c9f58f';g.font='bold 38px sans-serif';g.textAlign='center';
-  let name=String(text||'VENTURE').toUpperCase();if(name.length>22)name=name.slice(0,20)+'…';g.fillText(name,256,78);
+function marketScoreFor(p){const base=Number.isFinite(Number(p&&p.score))?Number(p.score):50;return Math.max(0,Math.min(100,base+(Number(p&&p.marketImpact)||0)))}
+function signedImpact(p){const impact=Number(p&&p.marketImpact)||0;return (impact>0?'+':'')+impact}
+function canvasLabel(project){
+  const c=document.createElement('canvas');c.width=512;c.height=160;const g=c.getContext('2d');
+  g.fillStyle='#1e2c22';g.fillRect(0,0,512,160);g.fillStyle='#c9f58f';g.font='bold 34px sans-serif';g.textAlign='center';
+  let name=String(project&&project.name||'VENTURE').toUpperCase();if(name.length>22)name=name.slice(0,20)+'…';g.fillText(name,256,67);
+  const impact=Number(project&&project.marketImpact)||0;
+  g.fillStyle='#f1f7ec';g.font='bold 25px sans-serif';g.fillText('CITY SCORE '+marketScoreFor(project||{score:50})+'/100  '+(impact>0?'+':'')+impact,256,124);
   const texture=new THREE.CanvasTexture(c);texture.colorSpace=THREE.SRGBColorSpace;
-  const material=new THREE.SpriteMaterial({map:texture,transparent:false});const sprite=new THREE.Sprite(material);sprite.scale.set(3.0,.75,1);return sprite
+  const material=new THREE.SpriteMaterial({map:texture,transparent:false});const sprite=new THREE.Sprite(material);sprite.scale.set(3.0,.95,1);return sprite
 }
 function createBox(parent,w,h,d,x,y,z,color,options){
   const material=new THREE.MeshStandardMaterial(Object.assign({color:color,roughness:.8},options||{}));
@@ -58,7 +62,7 @@ function makeBuilding(p,index){
     }
   }
   createBox(group,.38,.75,.08,0,.38,.98,0x273c32);
-  const sign=canvasLabel(p.name);sign.position.set(0,height+.72,0);group.add(sign);
+  const sign=canvasLabel(p);sign.position.set(0,height+.72,0);group.add(sign);
   const founder=makePerson(0xe8d68b,.82);founder.position.set(1.65,0,1.35);group.add(founder);
   const ring=new THREE.Mesh(new THREE.TorusGeometry(.48,.035,5,24),new THREE.MeshStandardMaterial({color:0xc4f586,emissive:0x5d8633,emissiveIntensity:.45}));
   ring.rotation.x=Math.PI/2;ring.position.set(1.65,.05,1.35);group.add(ring);
@@ -91,7 +95,7 @@ function resize(){if(!renderer||!camera)return;const w=root.clientWidth,h=root.c
 function projectFor(id){return projects.find(p=>p.id===id)}
 function showProject(p){
   if(!p)return;selectedId=p.id;
-  document.querySelector('#venture-details').innerHTML='<h3>'+escapeHtml(p.name)+'</h3><div class="world-meta">'+escapeHtml(p.category||'Community')+' · SIMULATED SCORE '+Number(p.score||0)+'</div><p>'+escapeHtml(p.description||p.solution||p.problem||'Early venture idea')+'</p><span class="world-level">BUILDING LEVEL '+levelFor(p)+' · '+Number(p.raised||0).toLocaleString()+' SIGNAL POINTS</span>';
+  document.querySelector('#venture-details').innerHTML='<h3>'+escapeHtml(p.name)+'</h3><div class="world-meta">'+escapeHtml(p.category||'Community')+' · SIMULATED SCORE '+Number(p.score||0)+' · CITY SCORE '+marketScoreFor(p)+'/100 ('+signedImpact(p)+')</div><p>'+escapeHtml(p.description||p.solution||p.problem||'Early venture idea')+'</p><span class="world-level">BUILDING LEVEL '+levelFor(p)+' · '+Number(p.raised||0).toLocaleString()+' SIGNAL POINTS</span>';
   ['#world-enter','#world-speak','#world-question','#world-ask','#world-demo-signal'].forEach(sel=>{const el=document.querySelector(sel);if(el)el.disabled=false});
   renderList();say('Founder pitch open: '+p.name+'. Ask a question or listen to the pitch.');
 }
@@ -106,7 +110,7 @@ function approachProject(p){
 }
 function renderList(){
   const list=document.querySelector('#world-project-list');if(!list)return;
-  list.innerHTML=projects.slice(0,positions.length).map((p,i)=>'<button class="'+(p.id===selectedId?'active':'')+'" data-world-project="'+escapeHtml(p.id)+'">'+String(i+1).padStart(2,'0')+' · '+escapeHtml(p.name)+' · L'+levelFor(p)+'</button>').join('');
+  list.innerHTML=projects.slice(0,positions.length).map((p,i)=>'<button class="'+(p.id===selectedId?'active':'')+'" data-world-project="'+escapeHtml(p.id)+'">'+String(i+1).padStart(2,'0')+' · '+escapeHtml(p.name)+' · CITY '+marketScoreFor(p)+'</button>').join('');
   list.querySelectorAll('[data-world-project]').forEach(btn=>btn.onclick=()=>approachProject(projectFor(btn.dataset.worldProject)));
 }
 function focusBuilding(id){
@@ -177,15 +181,38 @@ function speakPitch(){
 function updateEventVisual(outcomes){
   outcomes.forEach(outcome=>{let b=buildings.find(item=>item.project.id===outcome.project.id);if(!b)return;b.eventColor=outcome.delta>=0?0x70b942:0xe78b54;b.pulseUntil=Date.now()+9000;refreshBuilding(outcome.project);b=buildings.find(item=>item.project.id===outcome.project.id);if(b){b.eventColor=outcome.delta>=0?0x70b942:0xe78b54;b.pulseUntil=Date.now()+9000}})
 }
-function spawnRewardRain(winners){
-  winners.slice(0,4).forEach(b=>{for(let i=0;i<7;i++){const coin=new THREE.Mesh(new THREE.CylinderGeometry(.13,.13,.055,12),new THREE.MeshStandardMaterial({color:0xffd45f,emissive:0x775000,emissiveIntensity:.28,metalness:.65,roughness:.28}));coin.position.set(b.group.position.x+(Math.random()-.5)*3,4+Math.random()*4,b.group.position.z+(Math.random()-.5)*2.5);coin.rotation.x=Math.PI/2;scene.add(coin);coinDrops.push({mesh:coin,speed:2.3+Math.random()*2.5})}})
+function spawnCoinRain(affectedBuildings){
+  affectedBuildings.slice(0,4).forEach(b=>{for(let i=0;i<7;i++){const coin=new THREE.Mesh(new THREE.CylinderGeometry(.13,.13,.055,12),new THREE.MeshStandardMaterial({color:0xffd45f,emissive:0x775000,emissiveIntensity:.28,metalness:.65,roughness:.28}));coin.position.set(b.group.position.x+(Math.random()-.5)*3,4+Math.random()*4,b.group.position.z+(Math.random()-.5)*2.5);coin.rotation.x=Math.PI/2;scene.add(coin);coinDrops.push({mesh:coin,speed:2.3+Math.random()*2.5})}})
 }
 async function marketEvent(manual){
   const events=[{category:'Climate',direction:1,title:'Green energy momentum',detail:'A fictional climate policy tailwind brings more attention to neighborhood energy ideas.'},{category:'AI Tools',direction:-1,title:'AI bubble reset',detail:'A fictional market correction makes AI tool builders prove durable user value.'},{category:'Health',direction:-1,title:'Health trust shock',detail:'A fictional privacy concern increases scrutiny of wellbeing products.'},{category:'Education',direction:1,title:'Learning access wave',detail:'A fictional access initiative increases interest in clear, inclusive learning tools.'}];
-  const event=events[Math.floor(Math.random()*events.length)],targets=projects.filter(p=>p.category===event.category),outcomes=targets.map(project=>{const score=Math.max(0,Math.min(100,Number(project.score)||50)),delta=event.direction>0?Math.min(3,1+Math.round(score/35)):Math.max(-3,Math.min(3,Math.round((score-60)/20)));project.marketImpact=Math.max(-12,Math.min(12,(Number(project.marketImpact)||0)+delta));return {project:project,score:score,delta:delta}}),winners=outcomes.filter(item=>item.delta>0),summary=outcomes.map(item=>`${item.project.name} ${item.delta>0?'+':''}${item.delta} impact (AI score ${item.score}/100)`).join('; ')||'No venture in this category yet';
-  save();renderList();document.querySelector('#world-feed').textContent='AI STRESS TEST: '+event.title+'. '+summary+'.';updateEventVisual(outcomes);if(winners.length)spawnRewardRain(winners.map(item=>buildings.find(b=>b.project.id===item.project.id)).filter(Boolean));marketPulse++;
-  try{const r=await fetch('/api/market/briefing',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({event:event.detail,category:event.category,outcomes:summary})});const data=await r.json();if(data.headline)document.querySelector('#world-feed').textContent=data.headline+' · '+summary+' · Coin rain is simulated; no PayPal payout was triggered.'}catch{}
-  if(manual)say('AI stress test applied to '+event.category+'. Coin rain is a game effect only; no money moved.');
+  const button=document.querySelector('#world-event');
+  if(button.disabled)return;
+  button.disabled=true;
+  try{
+    const availableEvents=events.filter(item=>projects.some(project=>project.category===item.category));
+    if(!availableEvents.length){say('No ventures are available for a market event yet.');return}
+    const event=availableEvents[Math.floor(Math.random()*availableEvents.length)],targets=projects.filter(p=>p.category===event.category);
+    const outcomes=targets.map(project=>{
+      const baseScore=Math.max(0,Math.min(100,Number.isFinite(Number(project.score))?Number(project.score):50)),before=marketScoreFor(project);
+      const desiredDelta=event.direction>0?Math.min(3,1+Math.round(baseScore/35)):-Math.min(3,1+Math.round((100-baseScore)/35));
+      const after=Math.max(0,Math.min(100,before+desiredDelta)),delta=after-before;
+      project.marketImpact=after-baseScore;
+      return {project:project,before:before,after:after,delta:delta}
+    });
+    const summary=outcomes.map(item=>`${item.project.name} ${item.before} → ${item.after} (${item.delta>0?'+':''}${item.delta})`).join('; ');
+    save();renderList();document.querySelector('#world-feed').textContent='MARKET CRISIS EVENT: '+event.title+'. '+summary+'. Coin rain is simulated; no money moved.';
+    updateEventVisual(outcomes);
+    spawnCoinRain(outcomes.map(item=>buildings.find(b=>b.project.id===item.project.id)).filter(Boolean));
+    marketPulse++;
+    try{
+      const response=await fetch('/api/market/briefing',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({event:event.detail,category:event.category,outcomes:summary})});
+      const data=await response.json();
+      if(!response.ok)throw new Error(data.error||'Market event commentary is unavailable.');
+      if(data.headline)document.querySelector('#world-feed').textContent=data.headline+' · '+summary+' · Coin rain is simulated; no money moved.';
+    }catch(error){document.querySelector('#world-feed').textContent+=' AI commentary unavailable: '+(error.message||'server is offline')+'.'}
+    if(manual)say('Market Crisis Event applied to '+event.category+'. City scores updated; coin rain is a game effect only.');
+  }finally{button.disabled=false}
 }
 function handleServerSignal(message){
   if(!message||message.type!=='community_signal'||!message.projectId)return;
