@@ -21,6 +21,7 @@ button,input{font:inherit}button{cursor:pointer}.world-nav{height:64px;display:f
 .world-status{position:absolute;right:12px;bottom:12px;padding:7px 9px;border-radius:7px;background:#fffdf0e8;color:#37452d;font:10px 'DM Mono',monospace}
 .world-stage-footer{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:11px 13px;color:#768071;font-size:9px}
 .world-stage-footer button{border:1px solid #dfebd2;background:#f4f8ee;color:#4d702f;border-radius:7px;padding:8px 10px;font-size:10px;font-weight:700}
+.world-stage-footer button.market-crisis-button{background:#253126;border-color:#253126;color:#c9fa8b}.world-stage-footer button.market-crisis-button:hover{background:#354a36}.world-stage-footer button.market-crisis-button:disabled{opacity:.6;cursor:wait}
 .world-sidebar{background:#fff;border:1px solid var(--line);border-radius:14px;padding:15px;box-shadow:0 8px 26px #1a2c1608}
 .world-sidebar-title h2{font:700 17px Manrope;margin:4px 0 11px}
 .world-venture-card{min-height:110px;padding:12px;border:1px solid #e5eddd;border-radius:10px;background:#f4f8ef}
